@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis/v9"
 	"github.com/gorilla/websocket"
 )
 
@@ -28,7 +29,11 @@ func InitRouter() *gin.Engine {
 }
 
 func MapRoutes(router *gin.Engine) {
-	repo := repository.NewDeviceRepository()
+
+	redisClient := redis.NewClient(&redis.Options{
+		Addr: "localhost:6379",
+	})
+	repo := repository.NewDeviceRepository(redisClient)
 	svc := service.NewDeviceService(repo)
 	ctrl := controller.NewDispatcherController(svc)
 	router.GET(defines.EndpointDeviceUpdate, func(c *gin.Context) {
