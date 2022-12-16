@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package domain;
+
+option go_package = "./pb";
+
+message Payload {
+    string deviceID = 1;
+    int64 timestamp = 2;
+    int64 battery = 3;
+    message Coordinates {
+        float latitude = 1;
+        float longitude = 2; 
+    }
+    Coordinates coordinates = 4;
+}
