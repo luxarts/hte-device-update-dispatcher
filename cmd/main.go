@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"hte-device-update-dispatcher/internal/controller"
 	"hte-device-update-dispatcher/internal/defines"
 	"hte-device-update-dispatcher/internal/repository"
 	"hte-device-update-dispatcher/internal/service"
+	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v9"
@@ -20,7 +23,7 @@ var wsupgrader = websocket.Upgrader{
 
 func main() {
 	router := InitRouter()
-	router.Run("localhost:8080")
+	router.Run()
 }
 func InitRouter() *gin.Engine {
 	r := gin.Default()
@@ -29,10 +32,16 @@ func InitRouter() *gin.Engine {
 }
 
 func MapRoutes(router *gin.Engine) {
-
 	redisClient := redis.NewClient(&redis.Options{
-		Addr: "localhost:6379",
+		Addr: os.Getenv(defines.EnvRedisHost),
 	})
+
+	ctx := context.Background()
+	err := redisClient.Ping(ctx).Err()
+	if err != nil {
+		log.Fatalf("Error ping Redis: %+v\n", err)
+	}
+
 	repo := repository.NewDeviceRepository(redisClient)
 	svc := service.NewDeviceService(repo)
 	ctrl := controller.NewDispatcherController(svc)
