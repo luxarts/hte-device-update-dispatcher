@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"hte-device-update-dispatcher/internal/controller"
 	"hte-device-update-dispatcher/internal/defines"
+	"hte-device-update-dispatcher/internal/metrics"
 	"hte-device-update-dispatcher/internal/repository"
 	"hte-device-update-dispatcher/internal/service"
 	"log"
@@ -22,6 +23,8 @@ var wsupgrader = websocket.Upgrader{
 }
 
 func main() {
+	metrics.StartServer()
+
 	router := InitRouter()
 	router.Run()
 }
